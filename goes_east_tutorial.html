@@ -1,0 +1,347 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Reading and Visualizing NetCDF data from GOES</title><meta name="generator" content="MATLAB 9.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-02-10"><meta name="DC.source" content="goes_east_tutorial.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Reading and Visualizing NetCDF data from GOES</h1><!--introduction--><p>Matlab contains functions that makes it easy to read and visualize geospatial data. In this script we will look at two functions that can be used to interact with NetCDF's and ways we can visualize the data in them.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">NetCDF Functions</a></li><li><a href="#8">Visualizing GOES LST Data</a></li><li><a href="#14">Adding A Shapefile</a></li></ul></div><h2 id="1">NetCDF Functions</h2><p>For the GOES data, there will always at least be 2 NetCDF files that you must work with. The first one is the file with the Latitude and Longitude coordinates, and the second one is the NetCDF with the LST data.</p><p>First we will use a function for reading any NetCDF file. Here 'ncread' is given the filename and the variable of interest. Here we load the Latitude and Longitude into our MATLAB workspace.</p><pre class="codeinput">Lat = ncread(<span class="string">'sample_CONUS_data.nc'</span>, <span class="string">'Latitude'</span>);
+Lon = ncread(<span class="string">'sample_CONUS_data.nc'</span>, <span class="string">'Longitude'</span>);
+</pre><p>We will also use the same function to read the GOES Land Surface Temperature (LST) data.</p><pre class="codeinput">GOES_LST = ncread(<span class="string">'sample_LST_data.nc'</span>,<span class="string">'LST'</span>);
+</pre><p>The function 'ncdisp' can be used to look at the metadata for the GOES data. This may be useful if you are interested in the particular 'Attributes' like units, the full name of a variable, how the variable handles missing data, etc.</p><pre class="codeinput">ncdisp(<span class="string">'sample_LST_data.nc'</span>);
+</pre><pre class="codeoutput">Source:
+           C:\Users\melev\Desktop\FORCE\GOESR\tutorial_fin\sample_LST_data.nc
+Format:
+           netcdf4
+Global Attributes:
+           conventions            = 'CF-1.7'
+           metadata_conventions   = 'Unidata Dataset Discovery v1.0'
+           dataset_name           = 'OR_ABI-L2-LSTC-M3_G16_s20181830002210_e20181830004583.nc'
+           instrument_type        = 'GOES R Series Advanced Baseline Imager'
+           keywords               = 'LAND SURFACE &gt; LAND TEMPERATURE &gt; LAND SURFACE TEMPERATURE'
+           orbital_slot           = 'GOES-Test'
+           platform_id            = 'G16'
+           production_environment = 'Local calculation'
+           scene_id               = 'CONUS'
+           spatial_resolution     = '2km at nadir'
+           summary                = 'The Land Surface (Skin) Temperature product consists of pixels containing the skin temperatures for each 'clear' or 'probably clear' or 'probably cloudy' land surface pixel. This product is generated from a regression algorithm that linearly combines ABI surface emissivity data, brightness temperature, and brightness temperature differences derived from top of atmosphere radiances from ABI bands with wavelengths 11.2 and 12.3 um. Product data is generated both day and night. The algorithm used is the enterprise LST retrieval algorithm for evaluation purpose.'
+           time_coverage_end      = '2018-07-02T00:04:58.3Z'
+           time_coverage_start    = '2018-07-02T00:02:21.0Z'
+           timeline_id            = 'ABI Mode 3'
+           title                  = 'Enterprise ABI L2 Land Surface (Skin) Temperature'
+Dimensions:
+           x                     = 2500
+           y                     = 1500
+           number_of_time_bounds = 2
+Variables:
+    LST                   
+           Size:       2500x1500
+           Dimensions: x,y
+           Datatype:   int16
+           Attributes:
+                       _FillValue          = -1
+                       _Unsigned           = 'true'
+                       add_offset          = 200
+                       ancillary_variables = 'PQI'
+                       cell_methods        = 'retrieval_local_zenith_angle: point quantitative_local_zenith_angle: point solar_zenith_angle: point t: point area: point'
+                       coordinates         = 'retrieval_local_zenith_angle quantitative_local_zenith_angle solar_zenith_angle t y x'
+                       grid_mapping        = 'goes_imager_projection'
+                       long_name           = 'ABI L2+ Land Surface (Skin) Temperature'
+                       resolution          = 'y: 0.000056 rad x: 0.000056 rad'
+                       scale_factor        = 0.005
+                       standard_name       = 'surface_temperature'
+                       units               = 'K'
+                       valid_range         = [2600  28600]
+    x                     
+           Size:       2500x1
+           Dimensions: x
+           Datatype:   int16
+           Attributes:
+                       add_offset    = -0.10133
+                       axis          = 'X'
+                       long_name     = 'GOES fixed grid projection x-coordinate'
+                       scale_factor  = 5.6e-05
+                       standard_name = 'projection_x_coordinate'
+                       units         = 'rad'
+    y                     
+           Size:       1500x1
+           Dimensions: y
+           Datatype:   int16
+           Attributes:
+                       add_offset    = 0.12821
+                       axis          = 'Y'
+                       long_name     = 'GOES fixed grid projection y-coordinate'
+                       scale_factor  = -5.6e-05
+                       standard_name = 'projection_y_coordinate'
+                       units         = 'rad'
+    t                     
+           Size:       1x1
+           Dimensions: 
+           Datatype:   double
+           Attributes:
+                       long_name     = 'J2000 epoch mid-point between the start and end image scan in seconds'
+                       bounds        = 'bounds'
+                       standard_name = 'time'
+                       axis          = 'T'
+                       units         = 'seconds since 2000-01-01 12:00:00'
+    time_bounds           
+           Size:       2x1
+           Dimensions: number_of_time_bounds
+           Datatype:   double
+           Attributes:
+                       long_name = 'Scan start and end times in seconds since epoch (2000-01-01 12:00:00)'
+    goes_imager_projection
+           Size:       1x1
+           Dimensions: 
+           Datatype:   int32
+           Attributes:
+                       grid_mapping_name              = 'geostationary'
+                       inverse_flattening             = 298.2572
+                       latitude_of_projection_origin  = 0
+                       long_name                      = 'GOES-R ABI fixed grid projection'
+                       longitude_of_projection_origin = -75
+                       perspective_point_height       = 35786024
+                       semi_major_axis                = 6378137
+                       semi_minor_axis                = 6356752.5
+                       sweep_angle_axis               = 'x'
+    PQI                   
+           Size:       2500x1500
+           Dimensions: x,y
+           Datatype:   int16
+           Attributes:
+                       _FillValue    = -1
+                       _Unsigned     = 'true'
+                       cell_methods  = 'retrieval_local_zenith_angle: point quantitative_local_zenith_angle: point solar_zenith_angle: point t: point area: point'
+                       coordinates   = 'retrieval_local_zenith_angle quantitative_local_zenith_angle solar_zenith_angle t y x'
+                       grid_mapping  = 'goes_imager_projection'
+                       long_name     = 'ABI L2+ Land Surface (Skin) Temperature product quality indicators'
+                       standard_name = 'status_flag'
+                       units         = 1
+</pre><p>The call to ncdisp has been suppressed because a lot of information is displayed. Below is image of the first few lines of output of the call to ncdisp.</p><p>If you take a look at your workspace you will notice that all 3 variables are the same size.</p><p>Double-clicking on these variables will show you the contents of each variable. Below is image of the GOES LST data. Here I have scrolled to a region in the matrix where there is both NaN ("Not a number", ie. missing data) and LST values.</p><h2 id="8">Visualizing GOES LST Data</h2><p>Here we show you two simple methods for quickly visualizing GOES LST data. One method uses the default MATLAB function and the other uses the Mapping Toolbox. Most of the names of functions in the Mapping Toolbox are have the same name as the functions from the default MATLAB with an 'm' appended to it.</p><p>Here we will use the 'pcolor' function to visualize the data. This creates a checkerboard-like image for the data.</p><pre class="codeinput">figure(1)
+pcolor(Lon, Lat, GOES_LST)
+shading <span class="string">flat</span>
+h = colorbar; set(get(h, <span class="string">'label'</span>), <span class="string">'string'</span>, <span class="string">'LST (K)'</span>) <span class="comment">% Add the axis for the LST data</span>
+title(<span class="string">"GOES-East Land Surface Temperature"</span>)
+</pre><img vspace="5" hspace="5" src="goes_east_tutorial_01.png" alt=""> <p>Using the MATLAB Mapping toolbox we can use aadditional functions that can interpret the spatial coordinates more readily.</p><pre class="codeinput">figure(2)
+worldmap([min(min(Lat)) max(max(Lat))], [min(min(Lon)) max(max(Lon))])
+pcolorm(Lat, Lon, GOES_LST) <span class="comment">% different order than the default 'pcolor'</span>
+h = colorbar; set(get(h, <span class="string">'label'</span>), <span class="string">'string'</span>, <span class="string">'LST (K)'</span>)
+title(<span class="string">"GOES-East LST: Entire Range"</span>)
+</pre><img vspace="5" hspace="5" src="goes_east_tutorial_02.png" alt=""> <p>The 'worldmap' function sets the limits of the bounding box that will encompass the region we are looking at. The inputs used here are the minimum and maximum for the latitude and the longitude, respectively.</p><p>You can specify the two extreme corners for your region of interest. Below is the code to visualize the same data as before but only for Texas.</p><pre class="codeinput">figure(3)
+worldmap([25.32, 37.93], [-109.06, -92.6])
+pcolorm(Lat, Lon, GOES_LST)
+h = colorbar; set(get(h, <span class="string">'label'</span>), <span class="string">'string'</span>, <span class="string">'LST (K)'</span>)
+title(<span class="string">"GOES-East LST: Texas"</span>)
+</pre><img vspace="5" hspace="5" src="goes_east_tutorial_03.png" alt=""> <p>We can do the same thing for New York.</p><pre class="codeinput">figure(4)
+IN = ingeoquad(Lat, Lon, [38.59, 42.28], [-77.56, -70.96]);
+<span class="comment">% worldmap([35.35, 46.53], [-82.51, -66.06])</span>
+worldmap([38.59, 42.28], [-77.56, -70.96])
+pcolorm(Lat, Lon, GOES_LST(IN))
+h = colorbar; set(get(h, <span class="string">'label'</span>), <span class="string">'string'</span>, <span class="string">'LST (K)'</span>)
+title(<span class="string">"GOES-East LST: New York"</span>)
+</pre><img vspace="5" hspace="5" src="goes_east_tutorial_04.png" alt=""> <h2 id="14">Adding A Shapefile</h2><p>We can also use the Mapping Toolbox to add a shapefile delineating the borders between states. We can read a shapefile using 'shaperead' and then show it with 'geoshow'. Here we have downloaded a shapefile from https://www.census.gov/geo/maps-data/data/cbf/cbf_state.html</p><pre class="codeinput">land = shaperead(<span class="string">'shapefiles\cb_2017_us_state_20m.shp'</span>, <span class="string">'UseGeoCoords'</span>, true, <span class="string">'BoundingBox'</span>, [-109.06, 25.32; -92.6, 37.93]);
+
+figure(5)
+worldmap([25.32, 37.93], [-109.06, -92.6])
+pcolorm(Lat, Lon, GOES_LST)
+h = colorbar; set(get(h, <span class="string">'label'</span>), <span class="string">'string'</span>, <span class="string">'LST (K)'</span>)
+geoshow(land, <span class="string">'DisplayType'</span>, <span class="string">'polygon'</span>, <span class="string">'FaceColor'</span>, <span class="string">'none'</span>);
+title(<span class="string">"GOES-East LST: Texas"</span>)
+
+figure(6)
+worldmap([40.34, 40.90], [-74.49, -73.4])
+<span class="comment">%land = shaperead('shapefiles\cb_2017_us_state_20m.shp', 'UseGeoCoords', true, 'BoundingBox', [-82.51, 35.35; -66.06, 46.53]);</span>
+land = shaperead(<span class="string">'C:\Users\melev\Desktop\FORCE\Maps\dtl_counties_NewYorkState.shp'</span>, <span class="string">'UseGeoCoords'</span>, true, <span class="string">'BoundingBox'</span>, [-82.51, 35.35; -66.06, 46.53]);
+pcolorm(Lat, Lon, GOES_LST)
+h = colorbar; set(get(h, <span class="string">'label'</span>), <span class="string">'string'</span>, <span class="string">'LST (K)'</span>)
+geoshow(land, <span class="string">'DisplayType'</span>, <span class="string">'polygon'</span>, <span class="string">'FaceColor'</span>, <span class="string">'none'</span>);
+title(<span class="string">"GOES-East LST: New York"</span>)
+</pre><img vspace="5" hspace="5" src="goes_east_tutorial_05.png" alt=""> <img vspace="5" hspace="5" src="goes_east_tutorial_06.png" alt=""> <p>There are many places online where you can search GIS datasets. A good starting point is: https://freegisdata.rtwilson.com/</p><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2018b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Reading and Visualizing NetCDF data from GOES
+% Matlab contains functions that makes it easy to read and visualize
+% geospatial data. In this script we will look at two functions that can be
+% used to interact with NetCDF's and ways we can visualize the data in
+% them.
+
+%% NetCDF Functions
+% For the GOES data, there will always at least be 2 NetCDF files that you
+% must work with. The first one is the file with the Latitude and Longitude
+% coordinates, and the second one is the NetCDF with the LST data.
+
+%%
+% First we will use a function for reading any NetCDF file.
+% Here 'ncread' is given the filename and the variable of interest. Here we
+% load the Latitude and Longitude into our MATLAB workspace.
+
+Lat = ncread('sample_CONUS_data.nc', 'Latitude');
+Lon = ncread('sample_CONUS_data.nc', 'Longitude');
+
+%%
+% We will also use the same function to read the GOES Land Surface
+% Temperature (LST) data. 
+GOES_LST = ncread('sample_LST_data.nc','LST');
+
+%% 
+% The function 'ncdisp' can be used to look at the metadata for the GOES
+% data. This may be useful if you are interested in the particular 'Attributes'
+% like units, the full name of a variable, how the variable handles missing
+% data, etc.
+
+ncdisp('sample_LST_data.nc');
+
+%%
+% The call to ncdisp has been suppressed because a lot of information is
+% displayed. Below is image of the first few lines of output of the call
+% to ncdisp.
+
+%%
+% If you take a look at your workspace you will notice that all 3 variables
+% are the same size.
+
+%%
+% Double-clicking on these variables will show you the contents of each
+% variable. Below is image of the GOES LST data. Here I have scrolled to
+% a region in the matrix where there is both NaN ("Not a number", ie.
+% missing data) and LST values.
+
+%% Visualizing GOES LST Data
+% Here we show you two simple methods for quickly visualizing GOES LST
+% data. One method uses the default MATLAB function and the other uses the
+% Mapping Toolbox. Most of the names of functions in the Mapping Toolbox 
+% are have the same name as the functions from the default MATLAB with an
+% 'm' appended to it. 
+
+%% 
+% Here we will use the 'pcolor' function to visualize the data. This
+% creates a checkerboard-like image for the data.
+figure(1)
+pcolor(Lon, Lat, GOES_LST)
+shading flat
+h = colorbar; set(get(h, 'label'), 'string', 'LST (K)') % Add the axis for the LST data
+title("GOES-East Land Surface Temperature")
+
+%%
+% Using the MATLAB Mapping toolbox we can use aadditional functions that
+% can interpret the spatial coordinates more readily.
+figure(2)
+worldmap([min(min(Lat)) max(max(Lat))], [min(min(Lon)) max(max(Lon))])
+pcolorm(Lat, Lon, GOES_LST) % different order than the default 'pcolor'
+h = colorbar; set(get(h, 'label'), 'string', 'LST (K)')
+title("GOES-East LST: Entire Range")
+
+%% 
+% The 'worldmap' function sets the limits of the bounding box that will
+% encompass the region we are looking at. The inputs used here are the
+% minimum and maximum for the latitude and the longitude, respectively.
+
+%%
+% You can specify the two extreme corners for your region of interest.
+% Below is the code to visualize the same data as before but only for
+% Texas.
+figure(3)
+worldmap([25.32, 37.93], [-109.06, -92.6])
+pcolorm(Lat, Lon, GOES_LST)
+h = colorbar; set(get(h, 'label'), 'string', 'LST (K)')
+title("GOES-East LST: Texas")
+
+%%
+% We can do the same thing for New York.
+figure(4)
+IN = ingeoquad(Lat, Lon, [38.59, 42.28], [-77.56, -70.96]);
+% worldmap([35.35, 46.53], [-82.51, -66.06])
+worldmap([38.59, 42.28], [-77.56, -70.96])
+pcolorm(Lat, Lon, GOES_LST(IN))
+h = colorbar; set(get(h, 'label'), 'string', 'LST (K)')
+title("GOES-East LST: New York")
+
+%% Adding A Shapefile
+% We can also use the Mapping Toolbox to add a shapefile delineating the
+% borders between states. We can read a shapefile using 'shaperead' and
+% then show it with 'geoshow'. Here we have downloaded a shapefile from 
+% https://www.census.gov/geo/maps-data/data/cbf/cbf_state.html
+land = shaperead('shapefiles\cb_2017_us_state_20m.shp', 'UseGeoCoords', true, 'BoundingBox', [-109.06, 25.32; -92.6, 37.93]);
+
+figure(5)
+worldmap([25.32, 37.93], [-109.06, -92.6])
+pcolorm(Lat, Lon, GOES_LST)
+h = colorbar; set(get(h, 'label'), 'string', 'LST (K)')
+geoshow(land, 'DisplayType', 'polygon', 'FaceColor', 'none');
+title("GOES-East LST: Texas")
+
+figure(6)
+worldmap([40.34, 40.90], [-74.49, -73.4])
+%land = shaperead('shapefiles\cb_2017_us_state_20m.shp', 'UseGeoCoords', true, 'BoundingBox', [-82.51, 35.35; -66.06, 46.53]);
+land = shaperead('C:\Users\melev\Desktop\FORCE\Maps\dtl_counties_NewYorkState.shp', 'UseGeoCoords', true, 'BoundingBox', [-82.51, 35.35; -66.06, 46.53]);
+pcolorm(Lat, Lon, GOES_LST)
+h = colorbar; set(get(h, 'label'), 'string', 'LST (K)')
+geoshow(land, 'DisplayType', 'polygon', 'FaceColor', 'none');
+title("GOES-East LST: New York")
+
+%%
+% There are many places online where you can search GIS datasets. A good
+% starting point is: https://freegisdata.rtwilson.com/
+%
+##### SOURCE END #####
+--></body></html>
